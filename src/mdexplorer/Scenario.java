@@ -2,6 +2,7 @@ package mdexplorer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -24,16 +25,15 @@ public class Scenario {
 	}
 	
 	
-	private Robot robot;
-	private Map<String, State> states;
+	private Map<String, State> states = new HashMap<String, State>();
 	private State currentState;
 	
 	// Process data from the MUD and see if the finite state machine updates 
-	public void processInput(String input) {
+	public void processInput(Robot robot, String user, String input) {
 		for (Transition t: currentState.transitions) {
 			if ((t.trigger == null) || t.trigger.triggeredBy(input)) {
 				for(Action a: t.actions) {
-					a.execute(robot);
+					a.execute(robot, user);
 				}
 				// TBD: Handle out-of-date state transition commands
 				currentState = states.get(t.newState);
@@ -56,11 +56,11 @@ public class Scenario {
 							 "enter booth",
 							 "go east",
 		                     "go south",
-		                     "look in bin"/*,
+		                     "look in bin",
 		                     "get slips from bin",
 		                     "go north",
 		                     "go north",
-		                     "sell slips to otik"*/};
+		                     "sell slips to otik"};
 		Action initialAction = new SendCommands(commands);
 		Action[] initialActions = {initialAction};
 		Transition autoTransition = new Transition();
@@ -69,6 +69,8 @@ public class Scenario {
 		autoTransition.newState = END_STATE_NAME;
 		initialState.name = "START";
 		initialState.transitions.add(autoTransition);
+		scenario.currentState = initialState;
+		scenario.states.put(initialState.name, initialState);
 		return scenario;
 	}
 	

@@ -5,5 +5,5 @@ public interface Action {
 	/**
 	 * Perform this action
 	 */
-	public void execute(Robot r);
+	public void execute(Robot r, String user);
 }

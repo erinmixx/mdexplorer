@@ -7,8 +7,10 @@ public class SendCommands implements Action {
 
 	private List<String> commands;
 	
-	public void execute(Robot r) {
-		
+	public void execute(Robot r, String user) {
+		for(String nextCommand: commands) {
+			r.getMud().send(user, nextCommand);
+		}
 	}
 	
 	public SendCommands(String[] commandArray) {

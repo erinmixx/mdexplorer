@@ -28,7 +28,7 @@ public class Robot implements MUD.Listener {
 	@Override
 	public void newText(String user, String lineOfText) {
 		if (currentScenario != null) {
-			currentScenario.processInput(lineOfText);			
+			currentScenario.processInput(this, user, lineOfText);			
 			if (currentScenario.isDone()) {
 				currentScenario = null;
 			}

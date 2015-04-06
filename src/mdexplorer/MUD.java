@@ -1,9 +1,7 @@
 package mdexplorer;
 
-import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.PrintStream;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -44,6 +42,9 @@ public class MUD {
 	private List<Listener> listeners = new ArrayList<Listener>();
 	private PrintStream mudInput;
 	private Thread listenThread;
+	
+	/** Timestamp of last command.  Used to throttle commands. */
+	private long timeOfLastCommand; 
 	
 	/**
 	 * Create an interface to a MUD on the internet
@@ -91,7 +92,20 @@ public class MUD {
 	 * @param command the command to execute
 	 */
 	public void send(String user, String command) {
+		long now = System.currentTimeMillis();
+		long sinceLast = now-timeOfLastCommand;
+		long THROTTLE = 200;
+		if (sinceLast < THROTTLE) {
+			// Throttle commands so we don't
+			// exceed the 10 commands per second limit
+			try {
+				Thread.sleep(THROTTLE-sinceLast);
+			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+			}
+		}
 		mudInput.println(command);
+		timeOfLastCommand = System.currentTimeMillis();;
 	}
 	
 	/**
@@ -124,7 +138,7 @@ public class MUD {
 							try {
 								nextListener.newText(username, nextOutput);
 							}
-							catch (Exception e) {
+							catch (ArithmeticException e) {
 								// Log it and keep going
 								e.printStackTrace();
 							}
