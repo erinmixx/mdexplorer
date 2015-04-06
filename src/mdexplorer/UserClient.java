@@ -32,7 +32,7 @@ public class UserClient implements MUD.Listener {
 		System.exit(0);
 	}
 	
-	private synchronized void startInput(String username) {
+	private synchronized void startInput(final String username) {
 		Runnable broadcastOutput = new Runnable() {
 			public void run() {
 				byte[] buffer = new byte[4096];

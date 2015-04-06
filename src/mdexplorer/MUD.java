@@ -56,10 +56,13 @@ public class MUD {
 	}
 	
 	/**
-	 * Register a listener to receive text from the MUD
+	 * Register a listener to receive text from the MUD.
+	 * If called more than once with the same listener, duplicate registrations are ignored.
 	 */
 	public void listen(Listener newListener) {
-		listeners.add(newListener);
+		if (!listeners.contains(newListener)) {
+			listeners.add(newListener);
+		}
 	}
 	
 	/** 
@@ -99,7 +102,7 @@ public class MUD {
 		// TBD
 	}
 	
-	private void startListening(String username, InputStream mudOutput) {
+	private void startListening(final String username, final InputStream mudOutput) {
 		Runnable broadcastOutput = new Runnable() {
 			public void run() {
 				byte[] buffer = new byte[4096];

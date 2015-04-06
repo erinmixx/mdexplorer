@@ -24,6 +24,9 @@ public class Explorer {
 		String password = props.getProperty("mdexplorer.password");
 		
 		mud.connect(user, password);
+		
+		Robot robot = new Robot(mud);
+		robot.executeScenario(Scenario.createTestScenario());
 	}
 
 	public static void main(String[] args) throws IOException {
