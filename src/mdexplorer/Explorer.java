@@ -4,6 +4,18 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
 public class Explorer {
 	
 	private Properties props;
@@ -26,7 +38,22 @@ public class Explorer {
 		mud.connect(user, password);
 		
 		Robot robot = new Robot(mud);
-		robot.executeScenario(Scenario.createTestScenario());
+		
+		Scenario scenario = null;
+		try {
+		    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		    DocumentBuilder builder = factory.newDocumentBuilder();
+			InputStream strm = Explorer.class.getClassLoader().getResourceAsStream("testScenarios.xml");
+		    Document document = builder.parse(strm);
+		    Node rootNode = document.getDocumentElement();
+			scenario = Scenario.load(rootNode);
+		} catch (SAXException e) {
+			throw new RuntimeException("Couldn't read XML file", e);
+		} catch (ParserConfigurationException e) {
+			throw new RuntimeException("Couldn't read XML file", e);
+		}
+
+		 robot.executeScenario(scenario);
 	}
 
 	public static void main(String[] args) throws IOException {

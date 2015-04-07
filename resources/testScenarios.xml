@@ -1,0 +1,20 @@
+<Scenario>
+    <State name="START">
+        <Transition to="END">
+            <Action type="SendCmdsAction">
+                go east
+				go east
+				go north
+				dial town
+				enter booth
+				go east
+		        go south
+		        look in bin
+		        get slips from bin
+		        go north
+		        go north
+		        sell slips to otik
+            </Action>
+        </Transition>
+    </State>
+</Scenario>

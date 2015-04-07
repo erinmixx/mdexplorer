@@ -1,6 +1,6 @@
 package mdexplorer;
 
-public interface Trigger {
+public interface Trigger extends Scenario.Prototype {
 	
 	public boolean triggeredBy(String input);
 }

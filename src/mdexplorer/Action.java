@@ -1,6 +1,6 @@
 package mdexplorer;
 
-public interface Action {
+public interface Action extends Scenario.Prototype {
 
 	/**
 	 * Perform this action
