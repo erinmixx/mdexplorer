@@ -9,7 +9,6 @@
 				enter booth
 				go east
 		        go south
-		        look in bin
 		        get slips from bin
 		        go north
 		        go north
