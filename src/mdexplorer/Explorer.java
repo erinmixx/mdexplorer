@@ -43,7 +43,7 @@ public class Explorer {
 		try {
 		    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		    DocumentBuilder builder = factory.newDocumentBuilder();
-			InputStream strm = Explorer.class.getClassLoader().getResourceAsStream("testScenarios.xml");
+			InputStream strm = Explorer.class.getClassLoader().getResourceAsStream("playRecordScenario.xml");
 		    Document document = builder.parse(strm);
 		    Node rootNode = document.getDocumentElement();
 			scenario = Scenario.load(rootNode);

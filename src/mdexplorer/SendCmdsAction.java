@@ -3,6 +3,7 @@ package mdexplorer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.w3c.dom.Node;
 
@@ -22,12 +23,14 @@ public class SendCmdsAction implements Action {
 		commands = new ArrayList<String>();
 	}
 	
-	public void execute(Robot r, String user) {
+	@Override
+	public void execute(Robot r, String user, Map<String, Object> vars) {
 		for(String nextCommand: commands) {
 			r.getMud().send(user, nextCommand);
 		}
 	}
 	
+	@Override
 	public SendCmdsAction load(Node node) {
 		String commandString = node.getTextContent();
 		String[] commandArray = commandString.trim().split("\n");

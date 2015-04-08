@@ -7,6 +7,8 @@
 				go north
 				go north
 				go east
+				open backpack
+				open bag
             </Action>
         </Transition>
     </State>
@@ -23,7 +25,10 @@
             <Trigger type="RegexTrigger">The backpack is empty</Trigger>
         </Transition>
         <Transition to="play record">
-            <Trigger type="oasis.RecordReader.GetTrackListTrigger"></Trigger>
+            <Trigger type="RegexTrigger" keys="album,singer,tracklist">
+            	This is the (?&lt;album&gt;.*) album by (?&lt;singer&gt;.*), released in \d{4}\.[^:]*Tracks:[^1]*(?&lt;tracklist&gt;(?:\d\d?\. [^\n]+\n)+)[^:]*hp:
+            </Trigger>
+            <Action type="oasis.RecordReader$StoreTrackListAction"></Action>
         </Transition>
     </State>
     <State name="play record">
@@ -33,12 +38,12 @@
     </State>
     <State name="see which track played">
         <Transition to="wait for track to end">
-            <Trigger type="oasis.RecordReader.GetTrackNameTrigger"></Trigger>
+            <Trigger type="oasis.RecordReader$GetTrackNameTrigger"></Trigger>
         </Transition>
     </State>
     <State name="wait for track to end">
         <Transition to="next record">
-            <Trigger type="oasis.RecordReader.ListenedAllTracksTrigger"></Trigger>
+            <Trigger type="oasis.RecordReader$ListenedAllTracksTrigger"></Trigger>
             <Action type="SendCmdsAction">
                 get record
                 put record in bag

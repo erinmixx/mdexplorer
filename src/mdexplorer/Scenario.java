@@ -56,11 +56,12 @@ public class Scenario {
 	
 	// Process data from the MUD and see if the finite state machine updates 
 	public void processInput(Robot robot, String user, String input) {
+		Map<String, Object> vars = new HashMap<String, Object>();
 		for (Transition t: currentState.transitions) {
-			if ((t.trigger == null) || t.trigger.triggeredBy(input)) {
+			if ((t.trigger == null) || t.trigger.triggeredBy(input, vars)) {
 				System.out.println("XXXXXXXXXXXXXXXXXXX Switching to state " + t.toState);
 				for(Action a: t.actions) {
-					a.execute(robot, user);
+					a.execute(robot, user, vars);
 				}
 				// TBD: Handle out-of-date state transition commands
 				currentState = states.get(t.toState);

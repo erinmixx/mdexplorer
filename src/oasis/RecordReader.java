@@ -1,7 +1,16 @@
 package oasis;
 
 import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.w3c.dom.Node;
+
+import mdexplorer.Action;
+import mdexplorer.Robot;
+import mdexplorer.Scenario.Prototype;
+import mdexplorer.Trigger;
 
 /**
  * Triggers for iterating through all the tracks in all the records at Roccos.
@@ -18,9 +27,22 @@ public class RecordReader {
 	 * Trigger that tries to parse out the track list
 	 * for a record.  Stores that in a static map.
 	 */
-	public static class GetTrackListTrigger {
-		Pattern firstLineRegex = Pattern.compile("This is the .* album by .*, released in \\d{4}\\.");
-		Pattern secondLineRegex = Pattern.compile("Tracks:");
+	public static class StoreTrackListAction implements Action {
+		
+		public StoreTrackListAction() {}
+		
+		@Override
+		public StoreTrackListAction load(Node node) {
+			// No setup needed
+			return new StoreTrackListAction();
+		}
+
+		@Override
+		public void execute(Robot r, String user, Map<String, Object> vars) {
+			System.out.println("XXXXXXXXXXXXXXX Storing track list for " + vars.get("singer") + "'s " + vars.get("album"));
+			System.out.println(vars.get("tracklist"));
+		}
+		
 		
 	}
 	
@@ -28,7 +50,19 @@ public class RecordReader {
 	 * Trigger that tries to parse a track name and updates the static map
 	 * to show that has been played.
 	 */
-	public static class GetTrackNameTrigger {
+	public static class GetTrackNameTrigger implements Trigger {
+
+		@Override
+		public Prototype load(Node node) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public boolean triggeredBy(String input, Map<String, Object> vars) {
+			// TODO Auto-generated method stub
+			return false;
+		}
 		
 	}
 
@@ -36,27 +70,19 @@ public class RecordReader {
 	 * Trigger that parses when track is done playing and, if done, whether all tracks
 	 * on this record has been played.
 	 */
-	public static class ListenedAllTracksTrigger {
-		
-	}
+	public static class ListenedAllTracksTrigger implements Trigger {
 
-	public static void main(String[] args) {
-		String testString = "This is the The Joshua Tree album by U2, released in 1987.\n" +
-				"\n" +
-				"Tracks:\n" +
-				"\n" +
-				"1. Where the Streets Have No Name\n" +
-				"2. I Still Haven't Found What I'm Looking For\n" +
-				"3. With or Without You\n" +
-				"4. Bullet the Blue Sky\n" +
-				"5. Running to Stand Still\n" +
-				"6. Red Hill Mining Town\n" +
-				"7. In God's Country\n" +
-				"8. Trip Through Your Wires\n" +
-				"9. One Tree Hill\n" +
-				"10. Exit\n" +
-				"11. Mothers of the Disappeared\n" +
-				"\n" +
-				"hp: 390/390  mp: 1000/1000  sp: 456/456 > ";
+		@Override
+		public Prototype load(Node node) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public boolean triggeredBy(String input, Map<String, Object> vars) {
+			// TODO Auto-generated method stub
+			return false;
+		}
+		
 	}
 }
