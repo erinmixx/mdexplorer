@@ -58,6 +58,7 @@ public class Scenario {
 	public void processInput(Robot robot, String user, String input) {
 		for (Transition t: currentState.transitions) {
 			if ((t.trigger == null) || t.trigger.triggeredBy(input)) {
+				System.out.println("XXXXXXXXXXXXXXXXXXX Switching to state " + t.toState);
 				for(Action a: t.actions) {
 					a.execute(robot, user);
 				}

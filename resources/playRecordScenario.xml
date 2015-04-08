@@ -1,0 +1,51 @@
+<Scenario>
+    <State name="START">
+        <Transition to="next record">
+            <Action type="SendCmdsAction">
+                go north
+				go north
+				go north
+				go north
+				go east
+            </Action>
+        </Transition>
+    </State>
+    <State name="next record">
+        <Transition to="getting record tracks">
+            <Action type="SendCmdsAction">
+                get record from backpack
+                look at record
+            </Action>
+        </Transition>
+    </State>
+    <State name="getting record tracks">
+        <Transition to="END">
+            <Trigger type="RegexTrigger">The backpack is empty</Trigger>
+        </Transition>
+        <Transition to="play record">
+            <Trigger type="oasis.RecordReader.GetTrackListTrigger"></Trigger>
+        </Transition>
+    </State>
+    <State name="play record">
+        <Transition to="see which track played">
+            <Action type="SendCmdsAction">put record on player</Action>
+        </Transition>
+    </State>
+    <State name="see which track played">
+        <Transition to="wait for track to end">
+            <Trigger type="oasis.RecordReader.GetTrackNameTrigger"></Trigger>
+        </Transition>
+    </State>
+    <State name="wait for track to end">
+        <Transition to="next record">
+            <Trigger type="oasis.RecordReader.ListenedAllTracksTrigger"></Trigger>
+            <Action type="SendCmdsAction">
+                get record
+                put record in bag
+            </Action>
+        </Transition>
+        <Transition to="play record">
+            <Trigger type="RegexTrigger">The song ends and the record falls onto the floor</Trigger>
+        </Transition>
+    </State>
+</Scenario>

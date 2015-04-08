@@ -1,6 +1,6 @@
 <Scenario>
     <State name="START">
-        <Transition to="END">
+        <Transition to="Checking for matches">
             <Action type="SendCmdsAction">
                 go east
 				go east
@@ -9,11 +9,46 @@
 				enter booth
 				go east
 		        go south
+		        look in bin
+            </Action>
+        </Transition>
+    </State>
+    <State name="Checking for matches">
+    	<Transition to="Check for slips">
+        	<Trigger type="RegexTrigger">The newbie bin contains.*matches</Trigger>
+        	<Action type="SendCmdsAction">
+    			get matches from bin
+    		</Action>
+    	</Transition>
+    	<Transition to="Check for slips">
+        	<Trigger type="RegexTrigger">The newbie bin contains</Trigger>
+        </Transition>
+    	<Transition to="Check for slips">
+        	<Trigger type="RegexTrigger">The newbie bin is completely empty</Trigger>
+        </Transition>
+    </State>
+    <State name="Check for slips">
+        <Transition to="Checking for slips">
+            <Action type="SendCmdsAction">
+             	look in bin   
+            </Action>
+        </Transition>
+    </State>
+    <State name="Checking for slips">
+        <Transition to="END">
+            <Trigger type="RegexTrigger">The newbie bin contains.*slips</Trigger>
+            <Action type="SendCmdsAction">
 		        get slips from bin
 		        go north
 		        go north
 		        sell slips to otik
             </Action>
+        </Transition>
+        <Transition to="END">
+            <Trigger type="RegexTrigger">The newbie bin contains</Trigger>
+        </Transition>
+        <Transition to="END">
+            <Trigger type="RegexTrigger">The newbie bin is completely empty</Trigger>
         </Transition>
     </State>
 </Scenario>

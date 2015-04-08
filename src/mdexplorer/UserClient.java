@@ -24,6 +24,7 @@ public class UserClient implements MUD.Listener {
 
 	@Override
 	public void newText(String user, String lineOfText) {
+		System.out.println("----------------------------------------------------");
 		System.out.println(lineOfText);
 	}
 
