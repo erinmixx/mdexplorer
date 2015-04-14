@@ -2,3 +2,4 @@ mdexplorer.server = mud.sample.com
 mdexplorer.port = 444
 mdexplorer.username = erin
 mdexplorer.password = mypassword
+mdexplorer.scenario_files=testScenarios.xml

@@ -1,4 +1,4 @@
-<Scenario>
+<Scenario name="play all roccos records">
     <State name="START">
         <Transition to="next record">
             <Action type="SendCmdsAction">

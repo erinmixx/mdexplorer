@@ -1,4 +1,4 @@
-<Scenario>
+<Scenario name="get money">
     <State name="START">
         <Transition to="Checking for matches">
             <Action type="SendCmdsAction">
@@ -42,6 +42,16 @@
 		        go north
 		        go north
 		        sell slips to otik
+		        go south
+		        go west
+		        go north
+		        go north
+		        go north
+		        go east
+		        ask zoe to deposit 1750 silver
+		        go west
+		        go south
+		        go south
             </Action>
         </Transition>
         <Transition to="END">

@@ -50,7 +50,7 @@ public class Scenario {
 		public Prototype load(Node node);
 	}
 	
-	
+	private String name;
 	private Map<String, State> states = new HashMap<String, State>();
 	private State currentState;
 	
@@ -70,12 +70,22 @@ public class Scenario {
 		}
 	}
 	
+	public String getName() {
+		return name;
+	}
+	
+	public String getState() {
+		return currentState.name;
+	}
+	
 	public boolean isDone() {
 		return currentState == null;
 	}
 	
 	public static Scenario load(Node node) {
 		Scenario loaded = new Scenario();
+		String scenarioName = node.getAttributes().getNamedItem("name").getNodeValue();
+		loaded.name = scenarioName;
 		NodeList stateNodes = node.getChildNodes();
 		for (int i=0; i<stateNodes.getLength(); ++i) {
 			Node nextNode = stateNodes.item(i);

@@ -1,5 +1,8 @@
 package mdexplorer;
 
+/**
+ * Executes a scenario
+ */
 public class Robot implements MUD.Listener {
 	
 	private MUD mud;
@@ -15,8 +18,9 @@ public class Robot implements MUD.Listener {
 	}
 	
 	public void executeScenario(Scenario s) {
-		// TBD: Support multiple scenarios
 		currentScenario = s;
+		System.out.println("XXXXXXXXXXXXXXXXXXX Executing scenario " + s.getName());
+		System.out.println("XXXXXXXXXXXXXXXXXXX Starting in state " + s.getState());
 		mud.listen(this);
 	}
 	

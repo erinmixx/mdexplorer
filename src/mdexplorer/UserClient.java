@@ -30,7 +30,8 @@ public class UserClient implements MUD.Listener {
 
 	@Override
 	public void disconnected(String user, boolean expected) {
-		System.exit(0);
+		// TBD: Only supports one user right now.
+		inputThread.interrupt();
 	}
 	
 	private synchronized void startInput(final String username) {

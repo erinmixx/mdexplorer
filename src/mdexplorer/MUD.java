@@ -6,6 +6,8 @@ import java.io.PrintStream;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class MUD {
 
@@ -43,8 +45,14 @@ public class MUD {
 	private PrintStream mudInput;
 	private Thread listenThread;
 	
+	/** The time when the MUD is next scheduled to reboot.  Negative number means unknown. */
+	private long rebootTime = -1;
+	
 	/** Timestamp of last command.  Used to throttle commands. */
 	private long timeOfLastCommand; 
+	
+	/** Whether we have asked the server to disconnect, like with a 'quit' command. */
+	private boolean expectingDisconnect = false;
 	
 	/**
 	 * Create an interface to a MUD on the internet
@@ -66,12 +74,25 @@ public class MUD {
 		}
 	}
 	
+	/**
+	 * Unregister a listener.  Will no longer receive text from the MUD.
+	 * @param listener the listener to unregister
+	 */
+	public void stopListening(Listener listener) {
+		listeners.remove(listener);
+	}
+	
 	/** 
 	 * Connect a user to the MUD
 	 * @param username name of user 
 	 * @param password password of user
 	 */
 	public void connect(String username, String password) throws IOException {
+		expectingDisconnect = username.trim().isEmpty();
+		// Reset reboot time if its from an ended MUD session
+		if (rebootTime < System.currentTimeMillis()) {
+			rebootTime = -1;
+		}
 		// TBD: Only supports one user right now
 		if (socket != null) {
 			throw new RuntimeException("Only supports one user");
@@ -92,6 +113,7 @@ public class MUD {
 	 * @param command the command to execute
 	 */
 	public void send(String user, String command) {
+		// TBD: Recognize a 'quit' command so we can expect a disconnect
 		long now = System.currentTimeMillis();
 		long sinceLast = now-timeOfLastCommand;
 		long THROTTLE = 200;
@@ -104,8 +126,22 @@ public class MUD {
 				Thread.currentThread().interrupt();
 			}
 		}
+		
+		if (command.trim().equals("quit")) {
+			expectingDisconnect = true;
+		}
 		mudInput.println(command);
 		timeOfLastCommand = System.currentTimeMillis();;
+	}
+	
+	/**
+	 * Block this thread until the MUD disconnects
+	 * @throws InterruptedException 
+	 */
+	public synchronized void waitFor() throws InterruptedException {
+		while (listenThread != null) {
+			this.wait();
+		}
 	}
 	
 	/**
@@ -113,10 +149,15 @@ public class MUD {
 	 * @param user the user to log out
 	 */
 	public void disconnect(String user) {
-		// TBD
+		doDisconnect(user, true);
+	}
+	
+	public long getRebootTime() {
+		return (rebootTime < System.currentTimeMillis() ? -1 : rebootTime);
 	}
 	
 	private void startListening(final String username, final InputStream mudOutput) {
+		final MUD thisMud = this;
 		Runnable broadcastOutput = new Runnable() {
 			public void run() {
 				byte[] buffer = new byte[4096];
@@ -127,13 +168,21 @@ public class MUD {
 						numBytes = mudOutput.read(buffer);
 					}
 					catch (IOException e) {
-						// TBD: Register disconnect
+						System.err.println("Exception encountered reading " + username + "'s MUD session.");
+						e.printStackTrace();
+						thisMud.listenThread.interrupt();
 					}
 					if (numBytes < 0) {
-						// TBD: Register disconnect
+						if (!expectingDisconnect) {
+							System.err.println("Server terminated " + username + "'s MUD session.");
+						}
+						thisMud.listenThread.interrupt();
 					}
 					else {
 						String nextOutput = new String(buffer, 0, numBytes);
+						if (rebootTime < 0) {
+							parseRebootTime(nextOutput);
+						}
 						for(Listener nextListener: listeners) {
 							try {
 								nextListener.newText(username, nextOutput);
@@ -145,9 +194,52 @@ public class MUD {
 						}
 					}
 				}
+				// Thread has been interrupted.  Disconnect.
+				doDisconnect(username, expectingDisconnect);
 			}
 		};
 		listenThread = new Thread(broadcastOutput, "MUD Output Listen Thread");
 		listenThread.start();
+	}
+	
+	private void doDisconnect(String user, boolean expected) {
+		listenThread = null;
+		try {
+			socket.close();
+		} catch (IOException e) {
+			// Don't care.  We're closing it out.
+		} catch (RuntimeException e) {
+			// Don't care.  We're closing it out.
+		}
+		socket = null;
+		for(Listener nextListener: listeners) {
+			try {
+				nextListener.disconnected(user, expected);
+			}
+			catch (Exception e) {
+				// Log it and keep going
+				e.printStackTrace();
+			}
+		}
+		synchronized(this) {
+			this.notify();
+		}
+	}
+	
+	private void parseRebootTime(String mudOutput) {
+		String regex = "Next reboot: [^\\n]*(\\d\\d?)h (\\d\\d?)m (\\d\\d?)s";
+		Pattern pattern = Pattern.compile(regex);
+		Matcher matcher = pattern.matcher(mudOutput);
+		if (matcher.find()) {
+			long time = System.currentTimeMillis();
+			String hourStr = matcher.group(1);
+			time += Long.parseLong(hourStr) * 60 * 60 * 1000;
+			String minuteStr = matcher.group(2);
+			time += Long.parseLong(minuteStr) * 60 * 1000;
+			String secondStr = matcher.group(3);
+			time += Long.parseLong(secondStr) * 1000;
+			
+			rebootTime = time;
+		}
 	}
 }
