@@ -67,7 +67,7 @@ public class Explorer {
 		jobs.add(job);
 		
 		
-		new UserClient(mud);
+		new UserClient(mud, true);
 
 		while (!Thread.interrupted()) {
 			long nextReboot = getNextReboot(mud);
@@ -102,6 +102,32 @@ public class Explorer {
 				Thread.currentThread().interrupt();
 			}
 		}
+	}
+	
+	public void test() throws IOException {
+		String server = props.getProperty("mdexplorer.server");
+		String portStr = props.getProperty("mdexplorer.port");
+		int port = Integer.parseInt(portStr);
+
+		final MUD mud = new MUD(server, port);
+		UserClient client = new UserClient(mud, true);
+		client.connect();
+		
+		System.out.println("Ready...");
+		System.in.read();
+		String user = users.keySet().iterator().next();
+		String password = users.get(user);
+		mud.connect(user, password);
+		final Robot robot = new Robot(mud);
+		final Scenario scenario = Scenario.load(scenarios.get("get money"));
+		robot.executeScenario(scenario);
+		try {
+			mud.waitFor();
+			System.out.println("Scenario done");
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+		}
+		
 	}
 	
 	/**
@@ -174,7 +200,7 @@ public class Explorer {
 		 Properties props = new Properties();
 		 props.load(strm);
 		 Explorer explorer = new Explorer(props);
-		 explorer.go();
+		 explorer.test();
 	}
 
 }
